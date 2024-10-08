@@ -73,6 +73,53 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-riscv下编译sysbench测试CPU" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2024/10/08/riscv%E4%B8%8B%E7%BC%96%E8%AF%91sysbench%E6%B5%8B%E8%AF%95CPU/" class="article-date">
+  <time class="dt-published" datetime="2024-10-08T15:50:06.000Z" itemprop="datePublished">2024-10-08</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2024/10/08/riscv%E4%B8%8B%E7%BC%96%E8%AF%91sysbench%E6%B5%8B%E8%AF%95CPU/">riscv下编译sysbench测试CPU</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="sysbench无法使用的原因"><a href="#sysbench无法使用的原因" class="headerlink" title="sysbench无法使用的原因"></a>sysbench无法使用的原因</h2><p>前段时间手头入了两块riscv的板子，一块milkv mars，一块荔枝派的3a，想用sysbench压测下cpu的性能，跟x86跟arm对比下，但是发现在riscv下没有sysbench，然后看到一个历史的讨论，因为luajit不支持riscv，所以sysbench也没办法使用，然后这个问题搁置比较久，在riscv下测试的性能，只能用其他测试方法来代换。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>但是偶尔也有看到部分的riscv下的发行版是有luajit的支持的，在网上搜索一番发现luajit已经有了riscv的版本，这里也感谢PLCT的哥哥们辛苦做的移植，目前也只有这个移植的版本可以使用，另外sysbench依赖的另外一个组件concurrency_kit也需要安装支持riscv的版本，目前sysbench对这两个第三方依赖有一个独立的三方目录，把这两个支持riscv版本的软件置换进去即可以编译下去。</p>
+<h2 id="解决步骤"><a href="#解决步骤" class="headerlink" title="解决步骤"></a>解决步骤</h2><p>大致的过程这里记录了下，方便以后查阅：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">apt install git autoconf libtool</span><br><span class="line"></span><br><span class="line">git clone https://github.com/akopytov/sysbench.git</span><br><span class="line">git clone https://github.com/concurrencykit/ck.git</span><br><span class="line">git clone https://github.com/plctlab/LuaJIT.git</span><br><span class="line"></span><br><span class="line">cd sysbench/</span><br><span class="line">./autogen.sh</span><br><span class="line">./configure --without-mysql</span><br><span class="line"></span><br><span class="line">mv third_party/luajit/luajit/ /tmp/</span><br><span class="line">mv third_party/concurrency_kit/ck/ /tmp/</span><br><span class="line"></span><br><span class="line">cp -R ../LuaJIT/ third_party/luajit/luajit</span><br><span class="line">cp -R ../ck/ third_party/concurrency_kit/ck</span><br><span class="line"></span><br><span class="line">make -j 8</span><br><span class="line">make install</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="测试结果"><a href="#测试结果" class="headerlink" title="测试结果"></a>测试结果</h2><p>测试的结果这里也发下：</p>
+<img src="/2024/10/08/riscv%E4%B8%8B%E7%BC%96%E8%AF%91sysbench%E6%B5%8B%E8%AF%95CPU/1.jpg" class="">
+
+<p>这里是在k1下单核的测试，测试每秒可以执行792次，测试结果是JH7110单核的1.5倍。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://kaolaolao.github.io/2024/10/08/riscv%E4%B8%8B%E7%BC%96%E8%AF%91sysbench%E6%B5%8B%E8%AF%95CPU/" data-id="cm20n3ewb0002l2cabq660dbb" data-title="riscv下编译sysbench测试CPU" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-macbook下sysbench压测问题" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2024/10/08/macbook%E4%B8%8Bsysbench%E5%8E%8B%E6%B5%8B%E9%97%AE%E9%A2%98/" class="article-date">
@@ -113,7 +160,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://kaolaolao.github.io/2024/10/08/macbook%E4%B8%8Bsysbench%E5%8E%8B%E6%B5%8B%E9%97%AE%E9%A2%98/" data-id="cm20ldrf60002ltca4q690q62" data-title="macbook下sysbench压测问题" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="https://kaolaolao.github.io/2024/10/08/macbook%E4%B8%8Bsysbench%E5%8E%8B%E6%B5%8B%E9%97%AE%E9%A2%98/" data-id="cm20n3ewd0003l2ca61m0fpph" data-title="macbook下sysbench压测问题" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -152,7 +199,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://kaolaolao.github.io/2024/10/08/first-blog/" data-id="cm20ldrf20001ltca2ibifsns" data-title="新的第一篇blog" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="https://kaolaolao.github.io/2024/10/08/first-blog/" data-id="cm20n3ew10000l2ca4fksdo05" data-title="新的第一篇blog" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -203,7 +250,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://kaolaolao.github.io/2024/10/08/hello-world/" data-id="cm20ldrew0000ltca1vsz5xv0" data-title="Hello World" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="https://kaolaolao.github.io/2024/10/08/hello-world/" data-id="cm20n3ew70001l2ca1btjejoa" data-title="Hello World" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -244,6 +291,10 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2024/10/08/riscv%E4%B8%8B%E7%BC%96%E8%AF%91sysbench%E6%B5%8B%E8%AF%95CPU/">riscv下编译sysbench测试CPU</a>
+          </li>
         
           <li>
             <a href="/2024/10/08/macbook%E4%B8%8Bsysbench%E5%8E%8B%E6%B5%8B%E9%97%AE%E9%A2%98/">macbook下sysbench压测问题</a>
